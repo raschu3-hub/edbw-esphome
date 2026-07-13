@@ -1,0 +1,19 @@
+# Secrets
+**/secrets.yaml
+*.bin
+*.7z
+*.zip
+
+# ESPHome build output
+.esphome/
+.pioenvs/
+.piolibdeps/
+.platformio/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

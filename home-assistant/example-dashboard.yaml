@@ -1,0 +1,10 @@
+type: entities
+title: EDECOA EM624A
+entities:
+  - entity: sensor.edecoa_em624a_ac_active_power
+  - entity: sensor.edecoa_em624a_ac_output_voltage
+  - entity: sensor.edecoa_em624a_battery_voltage
+  - entity: sensor.edecoa_em624a_battery_capacity
+  - entity: sensor.edecoa_em624a_pv_charging_power
+  - entity: sensor.edecoa_em624a_inverter_temperature
+  - entity: sensor.edecoa_em624a_device_mode

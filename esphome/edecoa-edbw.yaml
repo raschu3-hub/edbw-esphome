@@ -1,0 +1,160 @@
+substitutions:
+  device_name: edecoa-edbw
+  friendly_name: EDECOA EM624A
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  comment: "EDECOA ED-BW_COMM V3.1 with ESPHome"
+  project:
+    name: "community.edecoa_edbw"
+    version: "1.0.0"
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  ap:
+    ssid: "EDECOA-EDBW-Fallback"
+    password: !secret fallback_password
+
+captive_portal:
+
+api:
+
+ota:
+  - platform: esphome
+
+logger:
+  level: DEBUG
+  baud_rate: 0
+  logs:
+    pipsolar: DEBUG
+    uart_debug: DEBUG
+
+uart:
+  id: inverter_uart
+  tx_pin: GPIO4
+  rx_pin: GPIO5
+  baud_rate: 2400
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+  rx_buffer_size: 512
+
+  debug:
+    direction: BOTH
+    dummy_receiver: false
+    after:
+      delimiter: "\r"
+
+pipsolar:
+  id: inverter
+  uart_id: inverter_uart
+
+sensor:
+  - platform: pipsolar
+    pipsolar_id: inverter
+
+    grid_voltage:
+      name: "Grid Voltage"
+
+    grid_frequency:
+      name: "Grid Frequency"
+
+    ac_output_voltage:
+      name: "AC Output Voltage"
+
+    ac_output_frequency:
+      name: "AC Output Frequency"
+
+    ac_output_apparent_power:
+      name: "AC Apparent Power"
+
+    ac_output_active_power:
+      name: "AC Active Power"
+
+    output_load_percent:
+      name: "Output Load"
+
+    bus_voltage:
+      name: "DC Bus Voltage"
+
+    battery_voltage:
+      name: "Battery Voltage"
+
+    battery_charging_current:
+      name: "Battery Charging Current"
+
+    battery_discharge_current:
+      name: "Battery Discharge Current"
+
+    battery_capacity_percent:
+      name: "Battery Capacity"
+
+    inverter_heat_sink_temperature:
+      name: "Inverter Temperature"
+
+    pv_input_voltage:
+      name: "PV Voltage"
+
+    pv_input_current_for_battery:
+      name: "PV Charging Current"
+
+    pv_charging_power:
+      name: "PV Charging Power"
+
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+    entity_category: diagnostic
+
+  - platform: uptime
+    name: "Uptime"
+    entity_category: diagnostic
+
+text_sensor:
+  - platform: pipsolar
+    pipsolar_id: inverter
+
+    device_mode:
+      name: "Device Mode"
+
+    last_qpigs:
+      name: "QPIGS Raw"
+      entity_category: diagnostic
+
+    last_qpiri:
+      name: "QPIRI Raw"
+      entity_category: diagnostic
+
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      entity_category: diagnostic
+
+    ssid:
+      name: "Connected SSID"
+      entity_category: diagnostic
+
+    mac_address:
+      name: "MAC Address"
+      entity_category: diagnostic
+
+  - platform: version
+    name: "ESPHome Version"
+    entity_category: diagnostic
+
+button:
+  - platform: restart
+    name: "Restart"
+    entity_category: diagnostic
+
+  - platform: safe_mode
+    name: "Safe Mode"
+    entity_category: diagnostic
