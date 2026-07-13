@@ -8,9 +8,7 @@ EDECOA ED-BW_COMM V3.1 ESPHome Firmware
 
 <p align="center">
 
-ESPHome firmware for the original **EDECOA ED-BW_COMM V3.1 (ESP32-C3)** WiFi module used with the **EDECOA EM624A** hybrid inverter.
-
-Replace the original cloud firmware and integrate your inverter directly into **Home Assistant**.
+Replace the original cloud firmware of the **EDECOA ED-BW_COMM V3.1 (ESP32-C3)** with **ESPHome** and integrate your **EM624A inverter** directly into **Home Assistant**.
 
 </p>
 
@@ -25,31 +23,15 @@ Replace the original cloud firmware and integrate your inverter directly into **
 
 ---
 
-# Overview
-
-This project replaces the original firmware inside the **EDECOA ED-BW_COMM V3.1 WiFi module** with **ESPHome**.
-
-Communication with the inverter is performed locally using the **Voltronic / PIP protocol** over the original RS232 interface.
-
-No cloud services are required.
-
----
-
 # Features
 
-✅ ESPHome
-
-✅ Home Assistant Integration
-
-✅ OTA Updates
-
-✅ Local Communication
-
-✅ PIP Protocol
-
-✅ UART Debug
-
-✅ Real-time Sensor Data
+- ESPHome firmware for the original ED-BW_COMM V3.1
+- Local communication (no cloud required)
+- Native Home Assistant integration
+- OTA firmware updates
+- Real-time inverter values
+- Voltronic / PIP protocol support
+- UART debugging
 
 ---
 
@@ -59,7 +41,7 @@ No cloud services are required.
 |---------|:------:|
 | ED-BW_COMM V3.1 | ✅ |
 | ESP32-C3 | ✅ |
-| EDECOA EM624A 6.2kW / 48V | ✅ |
+| EDECOA EM624A 6.2 kW / 48 V | ✅ |
 | ESPHome | ✅ |
 | Home Assistant | ✅ |
 
@@ -68,60 +50,53 @@ No cloud services are required.
 # Hardware
 
 <p align="center">
-<img src="docs/images/edbw-front.jpg" width="700">
+<img src="docs/images/edbw-front.jpg" width="650">
 </p>
 
-Original EDECOA ED-BW_COMM V3.1 PCB.
-
-### Rear Side
+Original EDECOA ED-BW_COMM V3.1 WiFi module.
 
 <p align="center">
-<img src="docs/images/edbw-back.jpg" width="700">
+<img src="docs/images/edbw-back.jpg" width="650">
 </p>
 
-### PCB Details
-
-<p align="center">
-<img src="docs/images/edbw-traces.jpg" width="700">
-</p>
+Rear side of the PCB.
 
 ---
 
-# Confirmed UART Configuration
+# UART Configuration
 
-| Signal | GPIO |
-|--------|------|
+Confirmed working configuration:
+
+| Parameter | Value |
+|-----------|-------|
 | TX | GPIO4 |
 | RX | GPIO5 |
+| Baud Rate | 2400 |
+| Data Bits | 8 |
+| Parity | None |
+| Stop Bits | 1 |
 
-Serial Parameters
+No hardware modifications are required.
 
-```
-2400 Baud
-8 Data Bits
-No Parity
-1 Stop Bit
-```
-
-Confirmed using live **QPI** and **QPIRI** responses.
+The original ED-BW module can be flashed directly using its USB interface.
 
 ---
 
-# Architecture
+# System Architecture
 
 ```text
-             Home Assistant
-                    ▲
-                    │ API
-                    │
-              ESPHome Firmware
-                    ▲
-                    │
-           ESP32-C3 (ED-BW_COMM)
-                    │
-              RS232 / PIP
-                    │
-            EDECOA EM624A
+                Home Assistant
+                       ▲
+                       │ API
+                       │
+                 ESPHome Firmware
+                       ▲
+                       │
+             ED-BW_COMM V3.1 (ESP32-C3)
+                       │
+                 RS232 / PIP Protocol
+                       │
+                 EDECOA EM624A
 ```
 
 ---
@@ -132,57 +107,57 @@ Confirmed using live **QPI** and **QPIRI** responses.
 <img src="docs/images/web-overview.png" width="100%">
 </p>
 
-Features shown:
+Live monitoring of the inverter directly from the ESPHome web interface.
 
-- Live inverter values
-- UART Debug
-- OTA Updates
-- Web Server
+Features include:
+
+- Live sensor values
+- UART debug log
+- OTA updates
+- Web server diagnostics
 
 ---
 
 # Energy Control Center Example
 
-This firmware is also used in a custom ESPHome based **Energy Control Center (ECC)**.
+The firmware is also used as part of a custom ESPHome based Energy Control Center.
 
 <p align="center">
 <img src="docs/images/LCD_dashboard.png" width="70%">
 </p>
 
-The ECC integrates:
+Integrated systems include:
 
 - EDECOA EM624A
 - JK-BMS
-- Victron
-- Hoymiles
-- Zendure
+- Victron SmartSolar
+- Hoymiles HMS-2000
+- Zendure Hub
 - go-e Charger
 
 ---
 
 # Installation
 
-## 1. Backup Original Firmware
+## 1. Backup the original firmware
 
-```
+```bash
 python -m esptool -p COM7 read-flash 0x000000 0x800000 backup.bin
 ```
 
-Store your backup safely.
-
 ---
 
-## 2. Copy ESPHome Configuration
+## 2. Copy
 
 ```
 esphome/edecoa-edbw.yaml
 ```
 
-into your ESPHome configuration folder.
+into your ESPHome configuration directory.
 
 ---
 
-## 3. Create secrets.yaml
+## 3. Configure secrets.yaml
 
 ```yaml
 wifi_ssid: "YOUR_WIFI"
@@ -194,9 +169,9 @@ fallback_password: "CHANGE_ME"
 
 ## 4. Flash via USB
 
-The first installation must be done via USB.
+The initial installation must be performed over USB.
 
-Future updates can be performed using OTA.
+Subsequent firmware updates can be installed over Wi-Fi using OTA.
 
 ---
 
@@ -204,53 +179,52 @@ Future updates can be performed using OTA.
 
 ```
 docs/
- └── images/
+    images/
 
 esphome/
 
 home-assistant/
 
 tools/
- └── uart-finder/
+    uart-finder/
 ```
 
 ---
 
 # Troubleshooting
 
-If the inverter does not respond, verify:
+If no inverter data is received:
 
-- GPIO4 = TX
-- GPIO5 = RX
-- 2400 Baud
-- RJ45 cable connected correctly
-- ESPHome logger baud rate disabled (`baud_rate: 0`)
+- Verify TX = GPIO4
+- Verify RX = GPIO5
+- Confirm 2400 baud
+- Disable serial logger (`baud_rate: 0`)
+- Check the RJ45 cable wiring
 
 ---
 
 # Disclaimer
 
-This project is **not affiliated with EDECOA**.
+This project is not affiliated with EDECOA.
 
 Flashing custom firmware replaces the original firmware.
 
-Use at your own risk.
+Always create a firmware backup before flashing.
 
-Always create a backup before flashing.
+Use at your own risk.
 
 ---
 
 # Contributing
 
-Issues, pull requests and hardware test reports are welcome.
+Contributions, bug reports and pull requests are welcome.
 
-If you test another EDECOA inverter model, please include:
+If you test another inverter model, please include:
 
 - inverter model
 - ESPHome version
 - board revision
 - UART logs
-- photos (if possible)
 
 ---
 
