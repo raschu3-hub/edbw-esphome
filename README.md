@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/banner.png" width="100%">
+</p>
+
 # EDECOA ED-BW_COMM V3.1 – ESPHome firmware
 
 Open ESPHome firmware for the original **EDECOA ED-BW_COMM V3.1** Wi-Fi dongle used with the **EDECOA EM624A** inverter.
