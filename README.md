@@ -1,160 +1,211 @@
 <p align="center">
-  <img src="docs/images/banner.png" width="100%">
+  <img src="docs/images/banner.png" width="900">
 </p>
 
-# EDECOA ED-BW_COMM V3.1 – ESPHome firmware
+<h1 align="center">
+EDECOA ED-BW_COMM V3.1 ESPHome Firmware
+</h1>
 
-Open ESPHome firmware for the original **EDECOA ED-BW_COMM V3.1** Wi-Fi dongle used with the **EDECOA EM624A** inverter.
+<p align="center">
 
-The original dongle contains an **ESP32-C3**, an onboard **SP3232 RS232 transceiver**, USB-C, Wi-Fi and an RJ45 connector. This project replaces the cloud firmware with ESPHome and exposes the inverter directly to Home Assistant.
+ESPHome firmware for the original **EDECOA ED-BW_COMM V3.1 (ESP32-C3)** WiFi module used with the **EDECOA EM624A** hybrid inverter.
 
-## Confirmed hardware and protocol
+Run your inverter completely **locally** without vendor cloud and integrate it directly into **Home Assistant**.
 
-| Item | Value |
-|---|---|
-| Dongle | EDECOA ED-BW_COMM V3.1 |
-| MCU | ESP32-C3 |
-| Flash | 8 MB |
-| USB | Native USB-Serial/JTAG |
-| RS232 transceiver | SP3232 |
-| Inverter UART TX | GPIO4 |
-| Inverter UART RX | GPIO5 |
-| Serial settings | 2400 baud, 8N1 |
-| Protocol | Voltronic/PIP |
-| Tested inverter | EDECOA EM624A 6.2 kW / 48 V |
+</p>
 
-The UART mapping was verified with live `QPI` and `QPIRI` responses:
+<p align="center">
 
-```text
-QPI   -> (PI30
-QPIRI -> (230.0 30.4 230.0 50.0 ... 6200 ...
+![ESPHome](https://img.shields.io/badge/ESPHome-Compatible-blue)
+![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Supported-41BDF5)
+![ESP32-C3](https://img.shields.io/badge/ESP32-C3-green)
+![License](https://img.shields.io/badge/License-MIT-orange)
+
+</p>
+
+---
+
+# Why?
+
+The original ED-BW WiFi module communicates with the inverter using the
+Voltronic / PIP protocol over RS232.
+
+This project replaces the original firmware with **ESPHome**, allowing direct
+integration into Home Assistant without cloud services.
+
+✔ Local communication
+
+✔ OTA updates
+
+✔ ESPHome
+
+✔ Home Assistant
+
+✔ Real-time inverter data
+
+---
+
+# Tested Hardware
+
+| Device | Status |
+|---------|:------:|
+| EDECOA ED-BW_COMM V3.1 | ✅ |
+| ESP32-C3 | ✅ |
+| EDECOA EM624A 6.2 kW / 48 V | ✅ |
+| Home Assistant | ✅ |
+| ESPHome | ✅ |
+
+---
+
+# Live Web Interface
+
+<p align="center">
+<img src="docs/images/esphome-webserver.png" width="100%">
+</p>
+
+The original ED-BW module running ESPHome.
+
+Features shown:
+
+- Live inverter values
+- UART Debug
+- PIP communication
+- OTA support
+
+---
+
+# Hardware
+
+<p align="center">
+<img src="docs/images/edbw-front.jpg" width="700">
+</p>
+
+Original EDECOA ED-BW_COMM V3.1 hardware.
+
+Confirmed UART:
+
+| Signal | GPIO |
+|--------|------|
+| TX | GPIO4 |
+| RX | GPIO5 |
+
+Serial settings
+
+```
+2400 Baud
+8 Data Bits
+No Parity
+1 Stop Bit
 ```
 
-## Important warning
+---
 
-Flashing ESPHome replaces the original EDECOA firmware.
+# Architecture
 
-Before flashing:
-
-1. Make a complete 8 MB backup.
-2. Store the backup safely and privately.
-3. Do not publish the original firmware image.
-4. Work on the low-voltage dongle only.
-5. Installation and modification are at your own risk.
-
-The inverter contains dangerous voltages. Do not open or modify the inverter itself unless you are qualified to do so.
-
-## Repository contents
-
-```text
-edbw-esphome/
-├── esphome/
-│   ├── edecoa-edbw.yaml
-│   └── secrets.example.yaml
-├── tools/
-│   └── uart-finder/
-│       └── edbw_uart_finder.ino
-├── docs/
-│   ├── backup-and-restore.md
-│   ├── flashing.md
-│   ├── hardware.md
-│   └── troubleshooting.md
-├── home-assistant/
-│   └── example-dashboard.yaml
-├── LICENSE
-└── README.md
+```
+                 Home Assistant
+                        ▲
+                        │ API
+                        │
+                  ESPHome Firmware
+                        ▲
+                        │
+                  ESP32-C3 (ED-BW)
+                        │
+                    RS232 (PIP)
+                        │
+                 EDECOA EM624A
 ```
 
-## 1. Back up the original firmware
+---
 
-First determine the flash size:
+# Installation
 
-```cmd
-python -m esptool -p COM7 flash-id
+1. Backup the original firmware
+
+```
+python -m esptool -p COM7 read-flash 0x000000 0x800000 backup.bin
 ```
 
-For the confirmed 8 MB device:
+2. Copy
 
-```cmd
-python -m esptool -p COM7 read-flash 0x000000 0x800000 edbw_backup.bin
 ```
-
-Verify that the backup is exactly 8,388,608 bytes.
-
-## 2. Flash ESPHome
-
-Copy:
-
-```text
 esphome/edecoa-edbw.yaml
 ```
 
-to your ESPHome configuration folder and create the matching secrets:
+to your ESPHome configuration.
+
+3. Add
 
 ```yaml
-wifi_ssid: "YOUR_WIFI"
-wifi_password: "YOUR_PASSWORD"
-fallback_password: "CHANGE_ME_123"
+wifi_ssid:
+wifi_password:
+fallback_password:
 ```
 
-Compile and install by USB.
+to your `secrets.yaml`.
 
-## 3. Connect to the inverter
+4. Flash using USB.
 
-Plug the original ED-BW RJ45 connector into the EM624A.
+5. Future updates can be done OTA.
 
-Expected log traffic:
+---
 
-```text
->>> QPIGS...
-<<< (000.0 00.0 230.0 49.9 ...
->>> QPIRI...
-<<< (230.0 30.4 230.0 50.0 ...
+# Home Assistant
+
+<p align="center">
+<img src="docs/images/homeassistant.png" width="100%">
+</p>
+
+Example entities:
+
+- Battery Voltage
+- Battery Capacity
+- PV Voltage
+- PV Charging Power
+- AC Output Voltage
+- AC Output Power
+- Inverter Temperature
+- Device Mode
+
+---
+
+# Real World Example
+
+<p align="center">
+<img src="docs/images/ecc-display.jpg" width="500">
+</p>
+
+This firmware is used inside a custom **Energy Control Center (ECC)** integrating:
+
+- EDECOA EM624A
+- JK-BMS
+- Victron
+- Hoymiles
+- Zendure
+- go-e Charger
+
+---
+
+# Repository Structure
+
+```
+docs/
+esphome/
+home-assistant/
+tools/
 ```
 
-Home Assistant should then receive values such as:
+---
 
-- AC output voltage and frequency
-- active and apparent power
-- battery voltage and SOC
-- charge and discharge current
-- PV voltage, current and power
-- inverter temperature
-- inverter operating mode
+# License
 
-## Restoring the original firmware
+MIT License
 
-```cmd
-python -m esptool -p COM7 erase-flash
-python -m esptool -p COM7 write-flash 0x000000 edbw_backup.bin
-```
+---
 
-Use only your own backup from your own device.
+# Acknowledgements
 
-## Status
+This project was developed by reverse engineering the original ED-BW_COMM V3.1 communication module and validating it on real EDECOA EM624A hardware.
 
-Confirmed working:
-
-- ESP32-C3 USB flashing
-- GPIO4/GPIO5 inverter UART
-- 2400 baud PIP communication
-- ESPHome `pipsolar`
-- Home Assistant entities
-- OTA updates after first USB flash
-
-## Contributing
-
-Hardware revisions may differ. Open an issue or pull request with:
-
-- board revision
-- clear PCB photos
-- UART scan result
-- inverter model
-- ESPHome version
-- relevant logs with secrets removed
-
-## License
-
-MIT for the source code and documentation in this repository.
-
-The original EDECOA firmware is not included and is not covered by this license.
+Contributions, pull requests and testing on other inverter models are welcome.
